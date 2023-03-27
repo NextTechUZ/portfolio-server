@@ -30,27 +30,31 @@ exports.login = async (req, res) => {
 };
 
 exports.routeProtector = async (req, res, next) => {
-  let token;
-  if (
-    req.headers.authorization &&
-    req.headers.authorization.startsWith("Bearer")
-  ) {
-    token = req.headers.authorization.split(" ")[1];
+  try {
+    let token;
+    if (
+      req.headers.authorization &&
+      req.headers.authorization.startsWith("Bearer")
+    ) {
+      token = req.headers.authorization.split(" ")[1];
+    }
+
+    if (!token) {
+      return sendError(res, "You are not logged in", 401);
+    }
+
+    const decoded = await util.promisify(jwt.verify)(
+      token,
+      process.env.JWT_SECRET
+    );
+    const { username, password } = decoded;
+
+    if (password !== "root" || username !== "root") {
+      return sendError(res, "Wrong password or username", 404);
+    }
+
+    next();
+  } catch (error) {
+    sendError(res, error.message, 404);
   }
-
-  if (!token) {
-    return sendError(res, "You are not logged in", 401);
-  }
-
-  const decoded = await util.promisify(jwt.verify)(
-    token,
-    process.env.JWT_SECRET
-  );
-  const { username, password } = decoded;
-
-  if (password !== "root" || username !== "root") {
-    return sendError(res, "Wrong password or username", 404);
-  }
-
-  next();
 };
