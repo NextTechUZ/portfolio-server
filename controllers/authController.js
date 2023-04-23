@@ -12,12 +12,12 @@ const createToken = (username, password) => {
 exports.login = async (req, res) => {
   try {
     const { username, password } = req.body;
-
+    console.log(req.body);
     if (!username || !password) {
       return sendError(res, "Please provide both password and username", 404);
     }
 
-    if (password !== "root" || username !== "root") {
+    if (username !== "nextech" || password !== "nehiqEYNIRoo") {
       return sendError(res, "Wrong password or username", 404);
     }
 
@@ -49,7 +49,7 @@ exports.routeProtector = async (req, res, next) => {
     );
     const { username, password } = decoded;
 
-    if (password !== "root" || username !== "root") {
+    if (username !== "nextech" || password !== "nehiqEYNIRoo") {
       return sendError(res, "Wrong password or username", 404);
     }
 
